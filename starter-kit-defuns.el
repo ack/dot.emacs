@@ -86,9 +86,6 @@ Symbols matching the text at point are put first in the completion list."
 (defun turn-on-whitespace ()
   (whitespace-mode t))
 
-(defun turn-on-paredit ()
-  (paredit-mode t))
-
 (defun turn-off-tool-bar ()
   (tool-bar-mode -1))
 
@@ -215,7 +212,8 @@ Symbols matching the text at point are put first in the completion list."
   "Turn on paredit mode for non-lisps."
   (set (make-local-variable 'paredit-space-delimiter-chars)
        (list ?\"))
-  (paredit-mode 1))
+  ;(paredit-mode -1)
+  )
 
 (defun esk-space-for-delimiter? (endp delimiter)
   (not (member major-mode '(ruby-mode espresso-mode js-mode js2-mode))))

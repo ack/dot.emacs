@@ -96,10 +96,10 @@
                                         (concat dotfiles-dir "backups")))))
 
 ;; nxhtml stuff
-(setq mumamo-chunk-coloring 'submode-colored
-      nxhtml-skip-welcome t
-      indent-region-mode t
-      rng-nxml-auto-validate-flag nil)
+;(setq mumamo-chunk-coloring 'submode-colored
+;      nxhtml-skip-welcome t
+;      indent-region-mode t
+;      rng-nxml-auto-validate-flag nil)
 
 ;; Associate modes with file extensions
 
@@ -134,10 +134,10 @@
      (set-face-foreground 'magit-diff-add "green3")
      (set-face-foreground 'magit-diff-del "red3")))
 
-(eval-after-load 'mumamo
-  '(eval-after-load 'zenburn
-     '(ignore-errors (set-face-background
-                      'mumamo-background-chunk-submode "gray22"))))
+;(eval-after-load 'mumamo
+;  '(eval-after-load 'zenburn
+;     '(ignore-errors (set-face-background
+;                      'mumamo-background-chunk-submode "gray22"))))
 
 ;; Platform-specific stuff
 (when (eq system-type 'darwin)

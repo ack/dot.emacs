@@ -82,10 +82,12 @@
                                      (message "Staged changes.")))))
 
 ;; Activate occur easily inside isearch
-(define-key isearch-mode-map (kbd "C-o")
-  (lambda () (interactive)
+(defun my-isearch-plus-occur ()
+    (interactive)
     (let ((case-fold-search isearch-case-fold-search))
-      (occur (if isearch-regexp isearch-string (regexp-quote isearch-string))))))
+      (occur (if isearch-regexp isearch-string (regexp-quote isearch-string)))))
+
+(define-key isearch-mode-map (kbd "C-M-o") 'my-isearch-plus-occur)
 
 ;; Org
 (define-key global-map "\C-cl" 'org-store-link)
