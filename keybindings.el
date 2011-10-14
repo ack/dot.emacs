@@ -37,7 +37,8 @@
 (global-set-key  (kbd "RET") 'newline-and-indent)
 (global-unset-key "\C-m")
 (global-set-key "\C-m" 'newline-and-indent)
-
+(require 'ruby-mode)
+(define-key ruby-mode-map (kbd "C-j")   'newline-and-indent)
 
 ;(global-unset-key "\C-x\C-c") ;; keep closing emacs?
 (global-unset-key "\C-o")
@@ -52,7 +53,7 @@
 (global-set-key "\C-o"        'other-window)
 (global-set-key "\C-z"        'term)
 
-(global-set-key "\M-\C-t" 'delete-trailing-whitespace)
+(global-set-key "\C-xt" 'delete-trailing-whitespace)
 
 (global-set-key (kbd "RET") 'newline-and-indent)
 

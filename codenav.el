@@ -27,8 +27,8 @@
     (pop-to-buffer imenu--target-buffer)
     (imenu sel)))
 
-(add-hook 'ruby-mode-hook 'imenu-add-menubar-index)
-(add-hook 'ruby-mode-hook 'imenu-make-selection-buffer)
+;(add-hook 'ruby-mode-hook 'imenu-add-menubar-index)
+;(add-hook 'ruby-mode-hook 'imenu-make-selection-buffer)
                                      
 
 

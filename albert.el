@@ -384,3 +384,50 @@
 (autoload 'guess-style-set-variable "guess-style" nil t)
 (autoload 'guess-style-guess-variable "guess-style")
 (autoload 'guess-style-guess-all "guess-style" nil t)
+
+
+
+
+
+(require 'iswitchb)
+;(require 'iswitchb-highlight)
+(iswitchb-mode 't)
+
+(add-hook 'iswitchb-minibuffer-setup-hook
+	  '(lambda () (set (make-local-variable 'max-mini-window-height) 3)))
+
+;(iswitchb-default-keybindings)
+
+(defadvice iswitchb-kill-buffer (after rescan-after-kill activate)
+  "*Regenerate the list of matching buffer names after a kill.
+    Necessary if using `uniquify' with `uniquify-after-kill-buffer-p'
+    set to non-nil."
+  (setq iswitchb-buflist iswitchb-matches)
+  (iswitchb-rescan))
+
+(defun iswitchb-rescan ()
+  "*Regenerate the list of matching buffer names."
+  (interactive)
+  (iswitchb-make-buflist iswitchb-default)
+  (setq iswitchb-rescan t))
+
+(defun iswitchb-local-keys ()
+  (mapc (lambda (K)
+          (let* ((key (car K)) (fun (cdr K)))
+            (define-key iswitchb-mode-map (edmacro-parse-keys key) fun)))
+        '(("<right>" . iswitchb-next-match)
+          ("\C-f" . iswitchb-next-match)
+          ("<left>"  . iswitchb-prev-match)
+          ("\C-b"  . iswitchb-prev-match)
+          ("<up>"    . ignore             )
+          ("<down>"  . ignore             ))))
+
+(add-hook 'iswitchb-define-mode-map-hook 'iswitchb-local-keys)
+
+(add-to-list 'iswitchb-buffer-ignore "*Completions")
+(add-to-list 'iswitchb-buffer-ignore "*Buffer")
+(add-to-list 'iswitchb-buffer-ignore "*Pymacs")
+;(add-to-list 'iswitchb-buffer-ignore "^[tT][aA][gG][sS]$")
+
+
+(load "experimental.el")
