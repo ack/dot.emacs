@@ -1,18 +1,56 @@
+
+(setq load-path (cons  "~/.emacs.d/" load-path))
 (setq load-path (cons  "~/.emacs.d/albert" load-path))
 (setq load-path (cons  "~/.emacs.d/albert/auto-complete" load-path))
 (setq load-path (cons  "~/.emacs.d/albert/pylookup" load-path))
 (setq load-path (cons  "~/.emacs.d/albert/python-libs" load-path))
-(setq load-path (cons  "~/.emacs.d/albert/solarized" load-path))
 
-(global-set-key (kbd "M-/") 'dabbrev-expand) ;; 'hippie-expand sucks
+(setq process-connection-type t)
+
+;(setq ls-lisp-use-insert-directory-program nil)
+(require 'ls-lisp)
+
+;; FIXES DROPBOX issue
+;; Find the appropriate format for displaying uid, gid, and
+;; file size, by finding the longest strings among all the
+;; files we are about to display.
+;;
+;; (dolist (elt file-alist)
+;;   (setq attr (cdr elt)
+;;         fuid (or (nth 2 attr) "")
+;;         uid-len (if (stringp fuid) (string-width fuid)
+;;                   (length (format "%d" fuid)))
+;;         fgid (or (nth 3 attr) "")
+;;         gid-len (if (stringp fgid) (string-width fgid)
+;;                   (length (format "%d" fgid)))
+;;         file-size (or (nth 7 attr) 0))
+;;   (if (> uid-len max-uid-len)))
+
+(server-start)
+
+
+(require 'projectile)
+(projectile-global-mode t)
+
 
 (ido-mode -1)
+;(ido-mode 'both)
+
+;(ido-mode 'both)
+;(setq ido-enable-prefix nil
+      ;ido-enable-flex-matching t
+      ;ido-create-new-buffer 'always
+      ;ido-use-filename-at-point 'guess
+      ;ido-max-prospects 10
+      ;ido-default-file-method 'selected-window)
+
 ;(paredit-mode -1)
 (setq visible-bell nil)
 
 
+
 ; set t to enable tracing in popup
-(setq debug-on-error t)
+(setq debug-on-error nil)
 
 
 ; expose system paths to emacs
@@ -47,6 +85,7 @@
   (global-set-key "\M-H" 'ns-do-hide-others)
 
   (set-frame-parameter nil 'fullscreen 'fullboth)
+  (global-unset-key (kbd "M-RET"))
   (global-set-key (kbd "M-RET") 'ns-toggle-fullscreen)
 
   (modify-frame-parameters nil '((wait-for-wm . nil)))
@@ -89,11 +128,13 @@
   )
 )
 
-; (color-theme-zenburn)
-; (color-theme-blackboard)
-(require 'color-theme)
 (color-theme-zenburn)
-(set-cursor-color 'yellow)
+; (color-theme-blackboard)
+
+
+;(require 'color-theme)
+;(color-theme-zenburn)
+;(set-cursor-color 'yellow)
 
 
 
@@ -109,16 +150,14 @@
 (add-hook 'after-init-hook 'session-initialize)
 
 (autoload 'tramp "Tramp")
+(setq tramp-default-method "sshx")
 
 (require 'xcscope)
-(require 'browse-kill-ring)             ; browse recent cuts
+;(require 'browse-kill-ring)             ; browse recent cuts
 
 ;--------------------------------------------------
 ;     iswitch configuation
 ;--------------------------------------------------
-(require 'uniquify)                     ; unique buffer names
-
-
 
 
 ;; auto-complete
@@ -175,8 +214,6 @@
 
 
 
-(load "keybindings.el")
-
 
 ;; lint
 (defun jslint-thisfile ()
@@ -190,7 +227,7 @@
 ;  (local-set-key [f8] 'jslint-thisfile)))
 (add-hook 'espresso-mode-hook
   '(lambda () (local-set-key [f8] 'jslint-thisfile)))
-  
+
 
 
 
@@ -220,7 +257,7 @@
      (setq pylookup-db-file "~/.emacs.d/albert/pylookup/pylookup.db")
      (define-key py-mode-map "\C-ch" 'pylookup-lookup)
 
-     
+
      (autoload 'python-pep8 "pep8" )
 
 
@@ -254,7 +291,6 @@
                                ("\\<\\(TBD\\)" 1 font-lock-warning-face t))
                              )
 
-     (require 'tramp)
      ;; Utilities that increase legibility and reduce code duplication
      (defun current-file-remotep ()
        "Tell if the file is remote"
@@ -298,7 +334,7 @@
   (setq ropemacs-enable-autoimport t)
   (setq ropemacs-autoimport-modules '("os" "sys" "httplib" "urllib" "hashlib" "shutil"))
 
-  (define-key py-mode-map [C-f3]  'rope-goto-definition) 
+  (define-key py-mode-map [C-f3]  'rope-goto-definition)
   (define-key py-mode-map [M-f3]  'rope-show-doc)
   (define-key py-mode-map [M-/]   'auto-complete)
 
@@ -330,11 +366,10 @@
   (lisp-interaction-mode))
 
 
-(require 'coffee-mode)
-(add-to-list 'auto-mode-alist '("\\.coffee$" . coffee-mode))
+;(require 'coffee-mode)
+;(add-to-list 'auto-mode-alist '("\\.coffee$" . coffee-mode))
 
 
-(require 'deft)
 
 
 (remove-hook 'coding-hook 'turn-on-auto-fill)
@@ -342,7 +377,7 @@
 (remove-hook 'coding-hook 'pretty-lambdas)
 ;(remove-hook 'ruby-mode-hook 'turn-on-auto-fill)
 ;(remove-hook 'python-mode-hook 'turn-on-auto-fill)
-
+;(remove-hook 'shell-mode-hook 'turn-on-auto-fill)
 
 
 (add-to-list 'package-archives '("marmalade" . "http://marmalade-repo.org/packages/"))
@@ -375,12 +410,6 @@
 
 
 
-(setq deft-extension "*")
-(setq deft-directory "~/src/appfog/Notes")
-(setq deft-text-mode 'markdown-mode)
-
-
-
 (autoload 'guess-style-set-variable "guess-style" nil t)
 (autoload 'guess-style-guess-variable "guess-style")
 (autoload 'guess-style-guess-all "guess-style" nil t)
@@ -389,14 +418,20 @@
 
 
 
+;; meaningful names for buffers with the same name
+(require 'uniquify)
+(setq uniquify-buffer-name-style 'forward)
+(setq uniquify-separator "/")
+(setq uniquify-after-kill-buffer-p t)    ; rename after killing uniquified
+(setq uniquify-ignore-buffers-re "^\\*") ; don't muck with special buffers
+
+
 (require 'iswitchb)
 ;(require 'iswitchb-highlight)
 (iswitchb-mode 't)
 
 (add-hook 'iswitchb-minibuffer-setup-hook
-	  '(lambda () (set (make-local-variable 'max-mini-window-height) 3)))
-
-;(iswitchb-default-keybindings)
+          '(lambda () (set (make-local-variable 'max-mini-window-height) 3)))
 
 (defadvice iswitchb-kill-buffer (after rescan-after-kill activate)
   "*Regenerate the list of matching buffer names after a kill.
@@ -430,4 +465,74 @@
 ;(add-to-list 'iswitchb-buffer-ignore "^[tT][aA][gG][sS]$")
 
 
-(load "experimental.el")
+
+(global-set-key (kbd "M-/") 'dabbrev-expand) ;; 'hippie-expand sucks
+
+;; hippie expand is dabbrev expand on steroids
+(setq hippie-expand-try-functions-list '(try-expand-dabbrev
+                                         try-expand-dabbrev-all-buffers
+                                         try-expand-dabbrev-from-kill
+                                         try-complete-file-name-partially
+                                         try-complete-file-name
+                                         try-expand-all-abbrevs
+                                         try-expand-list
+                                         try-expand-line
+                                         try-complete-lisp-symbol-partially
+                                         try-complete-lisp-symbol))
+
+;; show-paren-mode: subtle highlighting of matching parens
+(show-paren-mode t)
+(setq show-paren-style 'parenthesis)
+
+
+
+;; dired - reuse current buffer by pressing 'a'
+(put 'dired-find-alternate-file 'disabled nil)
+
+;; ediff - don't start another frame
+(setq ediff-window-setup-function 'ediff-setup-windows-plain)
+
+
+
+;; clean up obsolete buffers automatically
+(require 'midnight)
+
+;; automatically indenting yanked text if in programming-modes
+(defvar yank-indent-modes '(python-mode LaTeX-mode TeX-mode)
+  "Modes in which to indent regions that are yanked (or yank-popped). Only
+modes that don't derive from `prog-mode' should be listed here.")
+
+(defvar yank-advised-indent-threshold 1000
+  "Threshold (# chars) over which indentation does not automatically occur.")
+
+(defun yank-advised-indent-function (beg end)
+  "Do indentation, as long as the region isn't too large."
+  (if (<= (- end beg) yank-advised-indent-threshold)
+      (indent-region beg end nil)))
+
+(defadvice yank (after yank-indent activate)
+  "If current mode is one of 'yank-indent-modes,
+indent yanked text (with prefix arg don't indent)."
+  (if (and (not (ad-get-arg 0))
+           (or (derived-mode-p 'prog-mode)
+               (member major-mode yank-indent-modes)))
+      (let ((transient-mark-mode nil))
+    (yank-advised-indent-function (region-beginning) (region-end)))))
+
+(defadvice yank-pop (after yank-pop-indent activate)
+  "If current mode is one of 'yank-indent-modes,
+indent yanked text (with prefix arg don't indent)."
+  (if (and (not (ad-get-arg 0))
+           (or (derived-mode-p 'prog-mode)
+               (member major-mode yank-indent-modes)))
+    (let ((transient-mark-mode nil))
+    (yank-advised-indent-function (region-beginning) (region-end)))))
+
+
+;(load "experimental.el")
+(load "keybindings.el")
+
+
+
+(setq org-todo-keywords
+      '((sequence "TODO(t)" "WAIT(w@/!)" "|" "DONE(d!)" "CANCELED(c@)")))

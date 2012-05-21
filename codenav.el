@@ -1,3 +1,4 @@
+(set-default 'imenu-auto-rescan t)
 
 (defvar imenu--selection-buffer " *imenu-select*")
 (defvar imenu--target-buffer nil)

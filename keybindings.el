@@ -13,6 +13,13 @@
 
 
 
+; vim style shift-j
+(fset 'join-lines
+   (lambda (&optional arg) "Keyboard macro." (interactive "p") (kmacro-exec-ring-item (quote ([14 134217848 106 111 105 110 45 108 105 110 101 return] 0 "%d")) arg)))
+(global-set-key "\C-\M-j" 'join-lines)
+
+
+
 ;;; TAB KEY
 (global-set-key "\M-]" 'albert-shift-region-right)
 (global-set-key "\M-[" 'albert-shift-region-left)
@@ -110,13 +117,13 @@
 ;(global-set-key [M-f1]               'fold-selective-display-reset) ; folding
 
 ;(global-set-key [f1]                 'find-file)
-(global-set-key [f1]               'electric-buffer-list)
+;(global-set-key [f1]               'electric-buffer-list)
 
 ;----------
 ; <F2>
 ;(global-set-key [f2]              'other-window)
-(global-set-key [f2]            'highlight-phrase)
-(global-set-key [C-f2]          'unhighlight-regexp)
+;(global-set-key [f2]            'highlight-phrase)
+;(global-set-key [C-f2]          'unhighlight-regexp)
 
 ;----------
 ; <F3>
@@ -208,3 +215,14 @@
 
 
 (global-set-key (kbd "C-c f")       'grep-find)
+
+(global-set-key (kbd "C-c C-b") 'projectile-jump-to-project-file)
+(global-set-key [f2] 'projectile-grep-in-project)
+
+(global-set-key [f1] 'org-agenda)
+;(global-set-key [S-f1] 'org-clock-clock-out)
+(global-set-key [M-f1] 'org-capture)
+
+
+(require 'org)
+(define-key org-mode-map "\M-r" 'org-table-recalculate-buffer-tables)
