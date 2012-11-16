@@ -26,9 +26,16 @@
 
 
 ;; i hate narrowing
+;; apropos narrow-to-region
 (global-unset-key "\C-xnn")
 (global-unset-key "\C-xnp")
 (global-unset-key "\C-xnd")
+
+
+(global-unset-key "\M-U")
+(global-set-key "\M-U" 'org-open-at-point)
+
+
 
 
 ;(global-unset-key "\C-i")
@@ -38,7 +45,16 @@
 ;(define-key global-map "\t" 'indent-for-tab-command)
 
 
-(global-set-key (kbd "<C-f4>") 'delete-frame)
+
+;; FRAMES
+(global-unset-key "\M-`")
+(global-set-key (kbd "<M-f2>") 'other-frame)
+(global-set-key "\M-`" 'other-frame)
+(global-set-key (kbd "<M-f3>") 'make-frame-command)
+(global-set-key (kbd "<M-f4>") 'delete-frame)
+
+
+
 
 (define-key global-map (kbd "RET") 'newline-and-indent)
 (global-set-key  (kbd "RET") 'newline-and-indent)
@@ -60,12 +76,11 @@
 (global-set-key "\C-o"        'other-window)
 (global-set-key "\C-z"        'term)
 
-(global-set-key "\C-xt" 'delete-trailing-whitespace)
+(global-set-key "\C-xt"       'delete-trailing-whitespace)
 
-(global-set-key (kbd "RET") 'newline-and-indent)
+(global-set-key (kbd "RET")   'newline-and-indent)
 
-(global-set-key (kbd "<C-f5>")        'toggle-truncate-lines)
-
+(global-set-key (kbd "<C-f5>") 'toggle-truncate-lines)
 
 (global-set-key "\M-\S-c" 'comment-or-uncomment-region)
 
@@ -92,8 +107,8 @@
 (global-set-key "\C-ck"      'browse-kill-ring)
 
 ;; navigate through symbols
-(global-set-key "\C-\M-t"     'imenu-make-selection-buffer)
-(global-set-key "\M-\S-t"     'my-imenu-jump-to-function)
+(global-set-key "\C-\M-t"     'my-imenu-jump-to-function)
+(global-set-key "\M-\S-t"     'imenu-make-selection-buffer)
 
 
 (defun scroll-down-keep-cursor () (interactive) (scroll-down 5))
@@ -129,7 +144,7 @@
 ; <F3>
 (global-set-key [C-f3]             'find-tag-at-point) ; ETAGS
 (global-set-key [f3]               'cscope-find-egrep-pattern) ; 'cscope-find-this-symbol
-(global-set-key [M-f3]             'cscope-index-files)
+(global-set-key [C-M-f3]             'cscope-index-files)
 
 
 
@@ -182,6 +197,10 @@
 (global-set-key [f12]              'delete-other-windows)
 (global-set-key [C-f12]            'split-window-horizontally)
 (global-set-key [M-f12]            'split-window-vertically)
+; my window extensions
+(global-set-key [C-M-f12]          'window-swap-orientation)
+(global-set-key "\C-x4"            'window-swap-orientation)
+(global-set-key [C-f4]             'bury-window) ; also C-x0
 
 
 
@@ -224,5 +243,33 @@
 (global-set-key [M-f1] 'org-capture)
 
 
+(defun toggle-split-axis()
+  (interactive)
+  
+  (split-window-horizontally)
+  )
+
 (require 'org)
 (define-key org-mode-map "\M-r" 'org-table-recalculate-buffer-tables)
+
+
+(defun google ()
+  "Do a Google search of the region or symbol at the point"
+  (interactive)
+  (let ((phrase (elt (region-or-thing 'symbol) 0)))
+    (browse-url (concat "http://www.google.com/search?q="
+                        (replace-regexp-in-string " " "+" phrase)))))
+(global-set-key "\M-?" 'google-search)
+
+
+
+; repeat-last-command
+(global-set-key [M-f7] 'repeat)
+
+; doc-last-command
+(defun doc-last-command()
+  (interactive)
+  (describe-function last-command))
+(global-set-key [C-f7] 'doc-last-command)
+
+
