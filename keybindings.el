@@ -259,7 +259,7 @@
   (let ((phrase (elt (region-or-thing 'symbol) 0)))
     (browse-url (concat "http://www.google.com/search?q="
                         (replace-regexp-in-string " " "+" phrase)))))
-(global-set-key "\M-?" 'google-search)
+(global-set-key "\M-?" 'google)
 
 
 
