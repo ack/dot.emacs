@@ -38,9 +38,9 @@
                     nil))))))
 (add-hook 'esk-js-mode-hook 'pretty-functions)
 
-(if (< (string-to-number emacs-version) 23.2)
-    (esk-configure-javascript "espresso")
-  (esk-configure-javascript "js"))
+;(if (< (string-to-number emacs-version) 23.2)
+;    (esk-configure-javascript "espresso")
+;  (esk-configure-javascript "js"))
 
 (provide 'starter-kit-js)
 ;;; starter-kit-js.el ends here

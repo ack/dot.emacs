@@ -32,38 +32,3 @@ or the thing at the point and its bounds if there is no region"
           (vector (buffer-substring-no-properties beg end) beg end)
         (message "Nothing under point")))))
 
-
-
-;; window utils
-(defun window-swap-pair-vertical (win right vertical)
-  (interactive)
-  (let ((buff (window-buffer right)))
-    (delete-window right)
-    (if (eq vertical t)
-        (split-window-vertically)
-      (split-window-horizontally))
-    (other-window 1)
-    (switch-to-buffer buff)))
-
-(defun window-swap-orientation ()
-  (interactive)
-  ; nuke myself
-  (walk-windows
-   (lambda (me)
-     ; check i'm still "live" - i have a buffer
-     (if (window-buffer me)
-         (let ((right (window-in-direction 'right me))
-               (left (window-in-direction 'left me))
-               (above (window-in-direction 'above me))
-               (below (window-in-direction 'below me))
-               (next (window-right me)))
-           (if (and (> (count-windows) 1)
-                    (not (eq next nil)))
-               (cond
-                ((eq next right) (window-swap-pair-vertical me next t))
-                ((eq next below) (window-swap-pair-vertical me next nil)))))))
-   nil nil))
-
-(defun bury-window ()
-  (interactive)
-  (delete-window (get-buffer-window)))

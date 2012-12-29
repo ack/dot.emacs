@@ -111,6 +111,9 @@ do
     -v)
 	VERBOSE=1
 	;;
+    -p)
+    PYTHON=1
+    ;;
     *)
 	DIR="$1"
 	;;
@@ -158,10 +161,10 @@ fi
 
 
 PYTHON_FILES=`grep '\.py$' $LIST_FILE`
-if [ "$PYTHON_FILES" != "" ]
-then
+PYCSCOPE_BIN=`which pycscope`
+if [ "X$PYTHON" != "X" ] ; then
     echo "PYTHON detected. running pycscope.py "
-    pycscope.py -i $LIST_FILE -f $DATABASE_FILE
+    $PYCSCOPE_BIN -i $LIST_FILE -f $DATABASE_FILE
 else
     cscope -b -i $LIST_FILE -f $DATABASE_FILE
 fi
