@@ -21,7 +21,7 @@
 (global-set-key "\C-xg"       'goto-line)
 (global-set-key "\C-x\C-w"    'what-line)
 (global-set-key "\C-o"        'other-window)
-(global-set-key "\C-z"        'term)
+;(global-set-key "\C-z"        'term)
 (global-set-key "\C-xt"       'delete-trailing-whitespace)
 
 (global-set-key "\M-\S-c" 'comment-or-uncomment-region)
@@ -66,6 +66,9 @@
 (global-set-key [C-f7] 'doc-last-command)
 
 
+(global-unset-key "\M-t")
+(global-set-key "\M-t" 'projectile-jump-to-project-file)
+(global-set-key "\M-p" 'projectile-jump-to-project-file)
 
 
 ;(define-key global-map (kbd "RET") 'newline-and-indent)

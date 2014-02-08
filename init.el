@@ -31,6 +31,9 @@
 (setq custom-file (concat dotfiles-dir "custom.el"))
 
 
+(setq custom-theme-load-path "~/.emacs.d/elpa")
+
+
 (require 'dired)
 
 

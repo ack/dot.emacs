@@ -18,7 +18,7 @@
     `(progn
        (autoload ',mode ,name ,(concat "Start " name "-mode") t)
        (add-to-list 'auto-mode-alist '("\\.js$" . ,mode))
-       (add-to-list 'auto-mode-alist '("\\.json$" . ,mode))
+       ;(add-to-list 'auto-mode-alist '("\\.json$" . ,mode))
        (add-hook ',hook 'moz-minor-mode)
        (add-hook ',hook 'esk-paredit-nonlisp)
        (add-hook ',hook 'run-coding-hook)

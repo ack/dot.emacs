@@ -442,7 +442,8 @@ agenda view showing the flagged items."
 	  (make-directory target-dir 'parents))
 	(if org-mobile-use-encryption
 	    (org-mobile-encrypt-and-move file target-path)
-	  (copy-file file target-path 'ok-if-exists))
+          ;(copy-file file target-path 'ok-if-exists)
+          )
 	(setq check (shell-command-to-string
 		     (concat org-mobile-checksum-binary " "
 			     (shell-quote-argument (expand-file-name file)))))

@@ -1,16 +1,21 @@
 
-(setq load-path (cons  "~/.emacs.d/" load-path))
+
+
+;(setq load-path (cons  "~/.emacs.d/" load-path))
 (setq load-path (cons  "~/.emacs.d/albert" load-path))
 (setq load-path (cons  "~/.emacs.d/albert/auto-complete" load-path))
+
 
 ; controls whether we get backtraces on lisp errors.
 ; useful for tracing plugin bugs. super annoying when not doing so
 ;(setq debug-on-error t) 
-(setq debug-on-error t) 
+(setq debug-on-error nil) 
 
 
 ;; expose system paths to emacs
 (push (concat (getenv "HOME") "/bin") exec-path)
+(push (concat (getenv "PATH") ":/usr/local/bin") exec-path)
+(setenv "PATH" (concat (getenv "PATH") ":/usr/local/bin"))
 (push "/usr/local/bin" exec-path)
 
 
@@ -38,7 +43,25 @@
 ;; [M-C-t] to list functions
 (load "codenav.el")
 
-(add-to-list 'package-archives '("marmalade" . "http://marmalade-repo.org/packages/"))
+
+(add-to-list 'load-path "~/.emacs.d/el-get/el-get")
+
+(unless (require 'el-get nil 'noerror)
+  (with-current-buffer
+      (url-retrieve-synchronously
+       "https://raw.github.com/dimitri/el-get/master/el-get-install.el")
+    (let (el-get-master-branch)
+      (goto-char (point-max))
+      (eval-print-last-sexp))))
+
+(el-get 'sync)
+
+
+
+(setq package-archives '(("gnu" . "http://elpa.gnu.org/packages/")
+                         ("marmalade" . "http://marmalade-repo.org/packages/")
+                         ("melpa" . "http://melpa.milkbox.net/packages/")))
+(require 'package)
 
 (setq visible-bell nil)
 
@@ -47,51 +70,61 @@
 (setq process-connection-type t)
 
 
-
+(set-default-font "-apple-Menlo-medium-normal-normal-*-12-*-*-*-m-0-iso10646-1")
 
 (when window-system
-  ;;; cmd key for meta
-  (setq mac-option-key-is-meta nil)
-  (setq mac-command-key-is-meta t)
-  (setq mac-command-modifier 'meta)
-  (setq mac-option-modifier 'none)
-  (ns-set-resource nil "ApplePressAndHoldEnabled" "NO")
-  ;;; In Emacs 23 (Cocoa) in Snow Leopard, Apple delete key deletes backward, not
-  ;;; forward as is usual. This fixes this behaviour.
-  (normal-erase-is-backspace-mode 1)
-  ;;; Set cmd-H to hide Emacs and cmd-shift-h to hide others, as usual in Mac OS
-  ;;; X. Usually bound to mark-paragraph
-  (global-set-key "\M-h" 'ns-do-hide-emacs)
-  (global-set-key "\M-H" 'ns-do-hide-others)
-
-  (set-frame-parameter nil 'fullscreen 'fullboth)
-  (global-unset-key (kbd "M-RET"))
-  (global-set-key (kbd "M-RET") 'ns-toggle-fullscreen)
-  
+ 
   (defun set-frame-size-according-to-resolution ()
     (interactive)
-    (if window-system
+    (if (memq window-system '(ns mac))
       (progn
+
+        ;;; cmd key for meta
+        (setq mac-option-key-is-meta nil)
+        (setq mac-command-key-is-meta t)
+        (setq mac-command-modifier 'meta)
+        (setq mac-option-modifier 'none)
+
+        ;;; unretard OSX repeatchar
+        (if (boundp 'ns-set-resource)
+            (ns-set-resource nil "ApplePressAndHoldEnabled" "NO"))
+
+        ;;; Set cmd-H to hide Emacs and cmd-shift-h to hide others, as usual in Mac OS
+        ;;; X. Usually bound to mark-paragraph
+        (global-set-key "\M-h" 'ns-do-hide-emacs)
+        (global-set-key "\M-H" 'ns-do-hide-others)
+
+        (global-unset-key (kbd "M-RET"))
+        (if (boundp 'ns-toggle-fullscreen)
+            (global-set-key (kbd "M-RET") 'ns-toggle-fullscreen)
+            (global-set-key (kbd "M-RET") 'toggle-frame-fullscreen))
+
+
+        ;(set-frame-parameter nil 'fullscreen 'fullboth)
+        
+        ;;; In Emacs 23 (Cocoa) in Snow Leopard, Apple delete key deletes backward, not
+        ;;; forward as is usual. This fixes this behaviour.
+        (normal-erase-is-backspace-mode 1)
+ 
         ;; use 120 char wide window for largeish displays
         ;; and smaller 80 column windows for smaller displays
         ;; pick whatever numbers make sense for you
         (if (> (x-display-pixel-width) 1200)
-            (add-to-list 'default-frame-alist (cons 'width 165))
+            (add-to-list 'default-frame-alist (cons 'width 160))
             (add-to-list 'default-frame-alist (cons 'width 80)))
         ;; for the height, subtract a couple hundred pixels
         ;; from the screen height (for panels, menubars and
         ;; whatnot), then divide by the height of a char to
         ;; get the height we want
-        (add-to-list 'default-frame-alist
-                     ;(cons 'height (/ (- (x-display-pixel-height) 200) (frame-char-height))))
-                     (cons 'height 50))
+        ;(add-to-list 'default-frame-alist
+        ;             ;(cons 'height (/ (- (x-display-pixel-height) 200) (frame-char-height))))
+        ;             (cons 'height 50))
+        ; jerk/spawn to initial offset (left-corner)
+        ;(setq initial-frame-alist '((top . 100) (left . 100)))
+        (modify-frame-parameters nil '((wait-for-wm . nil)))
         )))
+  
   (set-frame-size-according-to-resolution)
-  
-  ; jerk/spawn to initial offset (left-corner)
-  (setq initial-frame-alist '((top . 100) (left . 300)))
-  (modify-frame-parameters nil '((wait-for-wm . nil)))
-  
 
 
   ;; apple-style increase-fontsize
@@ -216,7 +249,6 @@
 (add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
 (add-hook 'ipython-shell-hook 'ansi-color-for-comint-mode-on)
 
-
 ;;==================================================
 ;; general plugins
 ;;==================================================
@@ -251,9 +283,16 @@
     )
   )
 
+(defun tomorrow ()
+  (load "color-theme-tomorrow.el")
+  (require 'color-theme-tomorrow)
+  (color-theme-tomorrow--define-theme night-bright))
+
 (require 'color-theme)
 ;(color-theme-charcoal-black)
-(color-theme-zenburn)
+(if (window-system)
+    (color-theme-zenburn)
+    (tomorrow))
 
 ;(global-set-key (kbd "<f9>") 'toggle-color-theme)
 
@@ -425,6 +464,18 @@
             (setq edebug-sit-for-seconds 3600)))
 
 
+;;==================================================
+;; go
+;;==================================================
+
+(require 'go-mode)
+(add-to-list 'auto-mode-alist '("\\.go$" . go-mode))
+(eval-after-load 'go-mode
+  '(progn
+     (setq tab-width 8)
+     (setq indent-tabs nil)))
+
+
 
 
 ;;==================================================
@@ -433,12 +484,25 @@
 ;; js-mode vs js2-mode selected as default mode in both:
 ;;    - starter-kit-js
 ;;    - starter-kit-misc
+(setq js2-mirror-mode nil)
 (require 'js2-mode)
 (add-to-list 'auto-mode-alist '("\\.js$" . js2-mode))
 (add-to-list 'auto-mode-alist '("\\.json$" . js2-mode))
 (add-hook 'js2-mode-hook 'moz-minor-mode)
 (add-hook 'js2-mode-hook 'run-coding-hook)
-(add-hook 'js2-mode-hook '(lambda () (setq tab-width 2)))
+
+(defun custom-js2-config ()
+  (progn
+    (setq js2-mirror-mode nil)
+    (setq tab-width 2)
+    (setq js2-basic-offset 2)
+    (setq js2-indent-on-enter-key nil)
+    (setq js2-electric-keys '())
+    (setq js2-bounce-indent-p t)
+    (setq js2-strict-missing-semi-warning nil)
+    (setq js2-auto-indent-p nil)))
+
+(add-hook 'js2-mode-hook 'custom-js2-config)
 
 ;; some sane js2 customize defaults
 ;  '(js2-bounce-indent-p t)
@@ -451,7 +515,7 @@
 ;; lint
 (defun jslint-thisfile ()
   (interactive)
-  (compile (format "jsl -conf /etc/jsl.conf -process %s" (buffer-file-name))))
+  (compile (format "/usr/local/bin/jsl -conf /etc/jsl.conf -process %s" (buffer-file-name))))
 (add-hook 'javascript-mode-hook '(lambda () (local-set-key [f8] 'jslint-thisfile)))
 (add-hook 'js2-mode-hook '(lambda () (local-set-key [f8] 'jslint-thisfile)))
 (add-hook 'espresso-mode-hook '(lambda () (local-set-key [f8] 'jslint-thisfile)))
@@ -477,7 +541,8 @@
           (lambda ()
             (progn
               (when (locate-library "slime-js")
-                (require 'setup-slime-js)))))
+                ;(require 'setup-slime-js)
+                ))))
 
 
 
@@ -505,6 +570,7 @@
 
 (setq load-path (cons  "~/.emacs.d/albert/rdebug" load-path))
 (require 'gud)
+(require 'gdb-ui)
 (require 'rdebug)
 (setq rdebug-many-windows nil)
 ;(setq rdebug-debug-active t)
@@ -530,8 +596,8 @@
 (setq rdebug-populate-common-keys-function 'my-rdebug-keys)
 
 
-(load "rdebug-dirmap.el")
-(load "rdebug-monkeypatches.el")
+;(load "rdebug-dirmap.el")
+;(load "rdebug-monkeypatches.el")
 
 
 
@@ -569,10 +635,12 @@
 ;;==================================================
 ;; PYTHON
 ;;==================================================
-(setq py-install-directory "~/.emacs.d/python-mode.el-0.6.12")
-(setq load-path (cons py-install-directory load-path))
-(require 'python-mode)
+
+;(setq py-install-directory "~/.emacs.d/albert/python-mode.el-0.6.12")
+;(setq load-path (cons py-install-directory load-path))
+;(require 'python-mode)
 (setq py-shell-name "ipython")
+(setq py-python-command-args '("-i"))
 
 (autoload 'virtualenv-workon "virtualenv"
   "Activate a Virtual Environment present using virtualenvwrapper" t)
@@ -584,10 +652,32 @@
             (setq tab-width 4)
             (setq python-indent 4)
             (py-guess-indent-offset)
+            (autoload 'python-pep8 "pep8" )
             (define-key py-mode-map (kbd "RET") 'newline-and-indent)
 
+            (define-key py-mode-map [f8] 'pep8)
+            
+            (font-lock-add-keywords 'python
+                                    '(("\\<\\(FIXME\\):" 1 font-lock-warning-face t)
+                                      ("\\<\\(WARNING\\):" 1 font-lock-warning-face t)
+                                      ("\\<\\(NOTE\\):" 1 font-lock-warning-face t)
+                                      ("\\<\\(IMPORTANT\\):" 1 font-lock-warning-face t)
+                                      ("\\<\\(TODO\\):" 1 font-lock-warning-face t)
+                                      ("\\<\\(TBC\\)" 1 font-lock-warning-face t)
+                                      ("\\<\\(TBD\\)" 1 font-lock-warning-face t))
+                                    )
+
             ))
-(require 'ipython)
+;(require 'ipython)
+
+
+(add-hook 'python-mode-hook 'auto-complete-mode)
+
+
+
+
+;(setq jedi:setup-keys t)
+;(add-hook 'python-mode-hook 'jedi:ac-setup)
 
 
 ;;==================================================
@@ -600,6 +690,7 @@
 (global-set-key "\C-c o" 'org-open-at-point-global)
 
 
+
 (defun my-org-mode ()
   (require 'org-mobile)
   (setq org-todo-keywords
@@ -608,22 +699,82 @@
   ;; Set to the location of your Org files on your local system
   (setq org-directory "~/org")
   (setq org-agenda-files '("~/org"))
-  ;; Set to the name of the file where new notes will be stored
-  (setq org-mobile-index-file "index.org")
-  (setq org-mobile-inbox-for-pull "~/org/refile.org")
-  ;; Set to <your Dropbox root directory>/MobileOrg.
-  (setq org-mobile-directory "~/org")
-                                        ;(setq org-mobile-directory "~/Dropbox/MobileOrg")
+  (setq org-refile-use-outline-path "~/org")
+  (setq org-agenda-filter nil)
 
-  (setq org-refile-targets '((nil :maxlevel . 2)
+  (setq org-mobile-index-file "~/org/index.org")
+  (setq org-mobile-inbox-for-pull "~/org/refile.org")
+  (setq org-mobile-directory "~/org")
+
+
+  (setq org-refile-targets '((nil :maxlevel . 1)
                                         ; all top-level headlines in the
                                         ; current buffer are used (first) as a
                                         ; refile target
-                             (org-agenda-files :maxlevel . 2)))
+                             (org-agenda-files :maxlevel . 1)))
 
-  (define-key org-mode-map "\M-r" 'org-table-recalculate-buffer-tables))
+  (define-key org-mode-map "\M-r" 'org-table-recalculate-buffer-tables)
+  (define-key org-mode-map "\C-c\C-d" 'org-archive-subtree)
+
+
+  (require 'org-publish)
+  ;; BROKEN
+  (setq org-publish-project-alist
+        '(
+          ("appfog-notes"
+           :base-directory "~/org/"
+           :base-extension "org"
+           :exclude "*"
+           :include ("appfog.org")
+           :publishing-directory "~/Sites/org/"
+           :recursive nil
+           :publishing-function org-publish-org-to-ascii
+           :headline-levels 4             ; Just the default for this project.
+           :auto-preamble t
+           )
+
+
+          ;("org-static"
+          ; :base-directory "~/org/"
+          ; :base-extension "css\\|js\\|png\\|jpg\\|gif\\|pdf\\|mp3\\|ogg\\|swf"
+          ; :publishing-directory "~/public_html/"
+          ; :recursive t
+          ; :publishing-function org-publish-attachment
+          ; )
+
+
+          ;("org" :components ("org-notes" "org-static"))
+          ("appfog" :components ("appfog-notes"))
+          ))
+  
+  ;(add-hook 'after-save-hook 'org-mobile-write-checksums)
+  ;(add-hook 'after-save-hook 'org-mobile-push)
+  ;(add-hook 'org-mode-hook 
+  ;          (lambda () 
+  ;            (add-hook 'after-save-hook 'org-mobile-push 'make-it-local)))
+
+)
+
 
 (add-hook 'org-mode-hook 'my-org-mode)
+
+
+(defun on-save-hook()
+  (when (eq major-mode 'org-mode)
+    (progn
+      ;(if (and
+      ;     nil
+      ;     (string= "appfog.org" (buffer-name (current-buffer))))
+      ;    (org-export-as-ascii (current-buffer)))
+      (org-mobile-check-setup)
+      (org-mobile-prepare-file-lists)
+      (org-mobile-copy-agenda-files)
+      ;(org-mobile-create-index-file)
+      (org-mobile-write-checksums))))
+
+
+(remove-hook 'after-save-hook 'on-save-hook)
+;(add-hook 'after-save-hook 'on-save-hook)
 
 
 
@@ -632,6 +783,14 @@
 (global-set-key [M-f1] 'org-capture)
 (global-unset-key "\M-U")
 (global-set-key "\M-U" 'org-open-at-point)
+
+
+;;==================================================
+;; coffee
+;;==================================================
+(require 'lua-mode)
+(add-to-list 'auto-mode-alist '("\\.lua$" . lua-mode))
+
 
 
 ;;==================================================
@@ -738,5 +897,6 @@ indent yanked text (with prefix arg don't indent)."
 
 
 
+;(load "irc.el")
 
 
