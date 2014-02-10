@@ -1,3 +1,0 @@
-[submodule "albert/custom/solarized"]
-	path = albert/solarized
-	url = git://github.com/sellout/emacs-color-theme-solarized.git
