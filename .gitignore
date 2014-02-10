@@ -22,3 +22,6 @@ tramp
 history
 elpa/*
 magnars/*
+ac-comphist.dat
+el-get
+recentf
