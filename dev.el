@@ -11,7 +11,7 @@
 ; controls whether we get backtraces on lisp errors.
 ; useful for tracing plugin bugs. super annoying when not doing so
 ;(setq debug-on-error t) 
-(setq debug-on-error nil) 
+;(setq debug-on-error t) 
 
 
 ;; expose system paths to emacs
@@ -19,6 +19,7 @@
 (push (concat (getenv "PATH") ":/usr/local/bin") exec-path)
 (setenv "PATH" (concat (getenv "PATH") ":/usr/local/bin"))
 (push "/usr/local/bin" exec-path)
+(push "/usr/local/go/bin" exec-path)
 
 
 ;; makes a brand new *scratch* buffer if not present, switch to it
@@ -72,7 +73,7 @@
 (setq process-connection-type t)
 
 
-;(set-default-font "-apple-Menlo-medium-normal-normal-*-12-*-*-*-m-0-iso10646-1")
+
 
 (when window-system
  
@@ -87,6 +88,9 @@
         (setq mac-command-modifier 'meta)
         (setq mac-option-modifier 'none)
 
+
+        ;(set-default-font "-apple-Menlo-medium-normal-normal-*-12-*-*-*-m-0-iso10646-1")
+        (set-default-font "-*-Monaco-normal-normal-normal-*-14-*-*-*-m-0-iso10646-1")
         ;;; unretard OSX repeatchar
         (if (boundp 'ns-set-resource)
             (ns-set-resource nil "ApplePressAndHoldEnabled" "NO"))
@@ -244,12 +248,12 @@
 ;; general plugins
 ;;==================================================
 
-;(require 'projectile)
-;(projectile-global-mode t)
+(require 'projectile)
+(projectile-global-mode t)
 
-(global-set-key [f2] 'projectile-jump-to-project-file)
-(global-set-key (kbd "C-c C-b") 'projectile-jump-to-project-file)
-(global-set-key (kbd "C-c b") 'projectile-jump-to-project-file)
+(global-set-key [f2] 'projectile-find-file)
+(global-set-key (kbd "C-c C-b") 'projectile-find-file)
+(global-set-key (kbd "C-c C-d") 'projectile-find-dir)
 
 
 ;(require 'iedit)
@@ -413,7 +417,7 @@
 ;; flymake
 ;;============================================================
 (require 'flymake)
-
+(setq flymake-run-in-place nil)
 (add-hook 'tramp-mode
           '(progn
                                         ; disable flymake for tramp files
@@ -444,6 +448,7 @@
 
 
 
+
 ;;==================================================
 ;; emacs-lisp
 ;;==================================================
@@ -457,17 +462,37 @@
             (setq edebug-sit-for-seconds 3600)))
 
 
-;;==================================================
-;; go
-;;==================================================
 
-(require 'go-mode)
-(add-to-list 'auto-mode-alist '("\\.go$" . go-mode))
-(eval-after-load 'go-mode
-  '(progn
-     (setq tab-width 8)
-     (setq indent-tabs nil)))
 
+
+
+(setq electric-indent-mode nil)
+(defun funky-indent-relative (&optional arg)
+  "Newline and indent 4 spaces relative to previous line.  With
+C-u, indent to same level as previous line."
+  (interactive "P")
+  (let* ((amount (if arg 0 4))
+         (indent (+ amount (save-excursion
+                             (back-to-indentation)
+                             (current-column)))))
+    (newline 1)
+    (insert (make-string indent ?\s))))
+
+;(global-key (kbd "C-<return>") #'funky-indent-relative)
+
+(require 'web-mode)
+
+(defun my-tab ()
+  (interactive)
+  (indent-relative))
+(defun my-newline-and-indent ()
+  (interactive)
+  (newline)
+  (indent-relative))
+(add-hook 'web-mode-hook (progn
+                           (define-key web-mode-map (kbd "RET") 'newline)
+                           (define-key web-mode-map (kbd "TAB") 'indent-relative-maybe)
+                           ))
 
 
 
@@ -478,24 +503,32 @@
 ;;    - starter-kit-js
 ;;    - starter-kit-misc
 (setq js2-mirror-mode nil)
-(require 'js2-mode)
-(add-to-list 'auto-mode-alist '("\\.js$" . js2-mode))
-(add-to-list 'auto-mode-alist '("\\.json$" . js2-mode))
-(add-hook 'js2-mode-hook 'moz-minor-mode)
-(add-hook 'js2-mode-hook 'run-coding-hook)
+;(require 'js2-mode)
+(add-to-list 'auto-mode-alist '("\\.js$" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.json$" . web-mode))
+
+(add-to-list 'auto-mode-alist '("\\.htm$" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.html$" . web-mode))
+;(add-hook 'js2-mode-hook 'moz-minor-mode)
+;(add-hook 'js2-mode-hook 'run-coding-hook)
+
+
+
 
 (defun custom-js2-config ()
   (progn
     (setq js2-mirror-mode nil)
-    (setq tab-width 2)
-    (setq js2-basic-offset 2)
+    (setq tab-width 4)
+    (setq js2-basic-offset 4)
     (setq js2-indent-on-enter-key nil)
     (setq js2-electric-keys '())
-    (setq js2-bounce-indent-p t)
+    (setq js2-bounce-indent-p nil)
     (setq js2-strict-missing-semi-warning nil)
     (setq js2-auto-indent-p nil)))
 
+
 (add-hook 'js2-mode-hook 'custom-js2-config)
+;(add-hook 'javascript-mode 'custom-javascript-config)
 
 ;; some sane js2 customize defaults
 ;  '(js2-bounce-indent-p t)
@@ -589,6 +622,8 @@
 (setq rdebug-populate-common-keys-function 'my-rdebug-keys)
 
 
+
+
 ;(load "rdebug-dirmap.el")
 ;(load "rdebug-monkeypatches.el")
 
@@ -644,11 +679,16 @@
                                         ; default to 4 spaces, but guess based on buffer
             (setq tab-width 4)
             (setq python-indent 4)
-            (py-guess-indent-offset)
             (autoload 'python-pep8 "pep8" )
-            (define-key py-mode-map (kbd "RET") 'newline-and-indent)
+            (define-key python-mode-map (kbd "RET") 'newline-and-indent)
 
-            (define-key py-mode-map [f8] 'pep8)
+            (define-key python-mode-map [f8] 'pep8)
+
+            (define-key python-mode-map [M-f7] 'gud-step)
+            (define-key python-mode-map [M-f8] 'gud-next)
+            (define-key python-mode-map [M-f9] 'gud-cont)
+            (define-key python-mode-map [M-f5] 'gud-stop)
+
             
             (font-lock-add-keywords 'python
                                     '(("\\<\\(FIXME\\):" 1 font-lock-warning-face t)
@@ -715,10 +755,12 @@
            :include ("appfog.org")
            :publishing-directory "~/Sites/org/"
            :recursive nil
-           :publishing-function org-publish-org-to-ascii
+           ;:publishing-function org-publish-org-to-ascii           
            :headline-levels 4             ; Just the default for this project.
            :auto-preamble t
            )
+
+          
           ;("org-static"
           ; :base-directory "~/org/"
           ; :base-extension "css\\|js\\|png\\|jpg\\|gif\\|pdf\\|mp3\\|ogg\\|swf"
@@ -756,9 +798,11 @@
 (remove-hook 'after-save-hook 'on-save-hook)
 ;(add-hook 'after-save-hook 'on-save-hook)
 
-(global-set-key [f1] 'org-agenda)
+;(global-set-key [f1] 'org-agenda)
+;(global-unset-key [f1])
 ;(global-set-key [S-f1] 'org-clock-goto)
-(global-set-key [M-f1] 'org-capture)
+;(global-set-key [M-f1] 'org-capture)
+;(global-unset-key [M-f1])
 (global-unset-key "\M-U")
 (global-set-key "\M-U" 'org-open-at-point)
 
@@ -777,42 +821,6 @@
 (require 'coffee-mode)
 (add-to-list 'auto-mode-alist '("\\.coffee$" . coffee-mode))
 
-
-
-;;==================================================
-;; indent on paste
-;;==================================================
-
-;; automatically indenting yanked text if in programming-modes
-(defvar yank-indent-modes '()
-  "Modes in which to indent regions that are yanked (or yank-popped). Only
-modes that don't derive from `prog-mode' should be listed here.")
-
-(defvar yank-advised-indent-threshold 1000
-  "Threshold (# chars) over which indentation does not automatically occur.")
-
-(defun yank-advised-indent-function (beg end)
-  "Do indentation, as long as the region isn't too large."
-  (if (<= (- end beg) yank-advised-indent-threshold)
-      (indent-region beg end nil)))
-
-(defadvice yank (after yank-indent activate)
-  "If current mode is one of 'yank-indent-modes,
-indent yanked text (with prefix arg don't indent)."
-  (if (and (not (ad-get-arg 0))
-           (or (derived-mode-p 'prog-mode)
-               (member major-mode yank-indent-modes)))
-      (let ((transient-mark-mode nil))
-    (yank-advised-indent-function (region-beginning) (region-end)))))
-
-(defadvice yank-pop (after yank-pop-indent activate)
-  "If current mode is one of 'yank-indent-modes,
-indent yanked text (with prefix arg don't indent)."
-  (if (and (not (ad-get-arg 0))
-           (or (derived-mode-p 'prog-mode)
-               (member major-mode yank-indent-modes)))
-    (let ((transient-mark-mode nil))
-    (yank-advised-indent-function (region-beginning) (region-end)))))
 
 
 (defun my-shift-region (start end count)
@@ -918,6 +926,7 @@ or the thing at the point and its bounds if there is no region"
 (global-set-key "\C-cf"      'grep-find)
 (global-unset-key "\C-o") ; keep other-buffer working in dired
 (define-key dired-mode-map "\C-o" 'other-window)
+(global-set-key "\C-o"       'other-window)
 
 (global-set-key "\C-xg"       'goto-line)
 (global-set-key "\C-x\C-w"    'what-line)
@@ -940,7 +949,9 @@ or the thing at the point and its bounds if there is no region"
 (global-unset-key "\C-xnp")
 (global-unset-key "\C-xnd")
 
-(global-set-key (kbd "<M-f10>") 'browse-url)
+;(global-set-key (kbd "<M-f10>") 'browse-url)
+(global-unset-key "\M-U")
+(global-set-key "\M-U" 'browse-url)
 
 (defun google ()
   "Do a Google search of the region or symbol at the point"
@@ -970,5 +981,127 @@ or the thing at the point and its bounds if there is no region"
 ;; Nice quick buffer switching
 (global-set-key "\C-x\C-b" 'electric-buffer-list)
 
+(defun fancy-align-regexp()
+  (interactive)
+  ;(mark-paragraph)
+  (align-region (region-beginning) (region-end) (read-from-minibuffer "align to: ") nil nil)
+  )
 
+
+
+(global-set-key "\C-c=" 'align-regexp)
+
+
+(load (concat dotfiles-dir "csv-mode.el"))
+(add-to-list 'auto-mode-alist '("\\.tsv$" . csv-mode))
+(add-to-list 'auto-mode-alist '("\\.csv$" . csv-mode))
+
+
+
+
+(load (concat dotfiles-dir "exec-path-from-shell.el"))
+(require 'exec-path-from-shell)
+(when (memq window-system '(mac ns))
+  (exec-path-from-shell-initialize)
+  (exec-path-from-shell-copy-env "GOPATH"))
+
+
+
+;;==================================================
+;; go
+;;==================================================
+(require 'go-mode)
+(add-to-list 'auto-mode-alist '("\\.go$" . go-mode))
+
+(defun go-go-mode-hook ()
+  (setq tab-width 8)
+  (setq indent-tabs nil)
+  
+  ; Use goimports instead of go-fmt
+  ;(setq gofmt-command "goimports")
+  ; Call Gofmt before saving
+  (add-hook 'before-save-hook 'gofmt-before-save)
+
+  ; Customize compile command to run go build
+  (if (not (string-match "go" compile-command))
+      (set (make-local-variable 'compile-command)
+           "go build -v && go test -v && go vet"))
+  ; Godef jump key binding
+  (define-key go-mode-map [M-f1] 'godef-jump-other-window)
+  (local-set-key [M-f1] 'godef-jump-other-window)
+  
+  (add-to-list 'load-path (expand-file-name "~/go/src/github.com/dougm/goflymake"))
+  
+  (require 'go-flymake)
+  (setq flymake-run-in-place nil)
+  
+  (require 'go-autocomplete)
+  (require 'auto-complete-config)
+  (ac-config-default)
+  (setenv "GOPATH" (expand-file-name "~/go"))
+  )
+
+(add-hook 'go-mode-hook 'go-go-mode-hook)
+;(load (expand-file-name "~/go/src/github.com/golang/tools/cmd/oracle/oracle.el"))
+;(add-hook 'go-mode-hook 'go-oracle-mode)
+
+;; C-c C-o <       go-oracle-callers
+;; C-c C-o >       go-oracle-callees
+;; C-c C-o c       go-oracle-peers
+;; C-c C-o d       go-oracle-definition
+;; C-c C-o f       go-oracle-freevars
+;; C-c C-o g       go-oracle-callgraph
+;; C-c C-o i       go-oracle-implements
+;; C-c C-o p       go-oracle-pointsto
+;; C-c C-o r       go-oracle-referrers
+;; C-c C-o s       go-oracle-callstack
+;; C-c C-o t       go-oracle-describe
+
+
+
+;; ========================================
+;; avy
+;; ========================================
+
+(require 'avy)
+(global-set-key (kbd "C-:") 'avy-goto-char)
+(global-set-key (kbd "C-'") 'avy-goto-char-2)
+(global-set-key (kbd "M-g f") 'avy-goto-line)
+(global-set-key (kbd "M-g w") 'avy-goto-word-1)
+
+(global-set-key (kbd "C-c j") 'avy-goto-word-or-subword-1)
+(global-set-key (kbd "s-.") 'avy-goto-word-or-subword-1)
+(global-set-key (kbd "s-w") 'ace-window)
+(avy-setup-default)
+
+
+
+
+(require 'markdown-mode)
+(add-to-list 'auto-mode-alist '("\\.md$" . markdown-mode))
+(defun open-with-shiba ()
+  "open a current markdown file with shiba"
+  (interactive)
+  (start-process "shiba" "*shiba*" "shiba" "--detach" buffer-file-name))
+(define-key markdown-mode-map (kbd "C-c C-c") 'open-with-shiba)
+
+
+(defun undef (sym)
+  (makunbound sym))
+
+; patched golang gud-based debugger
+(load (expand-file-name "~/.emacs.d/go-dlv/go-dlv.el"))
+
+
+(require 'org-crypt)
+(org-crypt-use-before-save-magic)
+(setq org-tags-exclude-from-inheritance (quote ("crypt")))
+;; GPG key to use for encryption
+;; Either the Key ID or set to nil to use symmetric encryption.
+(setq org-crypt-key nil)
+
+
+(require 'epa-file)
+(epa-file-enable)
+(setq epa-file-select-keys nil)
 

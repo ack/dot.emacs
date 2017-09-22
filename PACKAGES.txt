@@ -1,35 +1,34 @@
-auto-complete
-browse-kill-ring
-coffee-mode
-color-theme
-dash
-epl
-flymake
-flymake-css
-flymake-easy
-flymake-go
-flymake-jslint
-flymake-json
-flymake-python-pyflakes
-flymake-ruby
-gh
-gist
-git-commit-mode
-git-rebase-mode
-go-mode
-js2-mode
-logito
-lua-mode
-magit
-pcache
-pkg-info
-popup
-projectile
-ruby-mode
-rvm
-session
-virtualenv
-virtualenvwrapper
-xcscope
-zenburn-theme
+(package-install 'auto-complete)
+(package-install 'browse-kill-ring)
+(package-install 'coffee-mode)
+(package-install 'color-theme)
+(package-install 'dash)
+(package-install 'epl)
+(package-install 'flymake)
+(package-install 'flymake-css)
+(package-install 'flymake-easy)
+(package-install 'flymake-go)
+(package-install 'flymake-jslint)
+(package-install 'flymake-json)
+(package-install 'flymake-python-pyflakes)
+(package-install 'flymake-ruby)
+(package-install 'gh)
+;(package-install 'gist)
+(package-install 'git-commit-mode)
+(package-install 'go-mode)
+(package-install 'js2-mode)
+(package-install 'logito)
+(package-install 'lua-mode)
+(package-install 'magit)
+(package-install 'pcache)
+(package-install 'pkg-info)
+(package-install 'popup)
+(package-install 'projectile)
+(package-install 'ruby-mode)
+(package-install 'rvm)
+(package-install 'session)
+(package-install 'virtualenv)
+;(package-install 'virtualenvwrapper)
+(package-install 'xcscope)
+(package-install 'zenburn-theme)
 

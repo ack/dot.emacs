@@ -4,7 +4,7 @@
                     (or (buffer-file-name) load-file-name)))
 
 ;; Load up ELPA, the package manager
-(add-to-list 'load-path dotfiles-dir)
+(add-to-list 'load-path (concat dotfiles-dir "/elpa"))
 (add-to-list 'load-path (concat dotfiles-dir "/elpa-to-submit"))
 (setq autoload-file (concat dotfiles-dir "loaddefs.el"))
 (setq package-user-dir (concat dotfiles-dir "elpa"))
@@ -123,5 +123,5 @@
 
 
 
-(load "dev.el"))
+(load (concat dotfiles-dir "dev.el"))
 
