@@ -121,7 +121,5 @@
 (setq x-select-enable-clipboard t)
 
 
-
-
 (load (concat dotfiles-dir "dev.el"))
 
